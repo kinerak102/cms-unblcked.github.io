@@ -15,7 +15,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({ onBack }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Embedded URL: Primary is locally hosted, secondary is high-availability githack mirror
-  const primaryUrl = '/game/retro-bowl/index.html';
+  const primaryUrl = './game/retro-bowl/index.html';
   const mirrorUrl = 'https://raw.githack.com/3kho/retro-bowl/main/production.html';
   const activeUrl = useMirrorSource ? mirrorUrl : primaryUrl;
 
