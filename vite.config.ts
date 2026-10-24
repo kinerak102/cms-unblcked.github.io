@@ -1,4 +1,4 @@
-import { defineConfig, Plugin } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import fs from 'fs'
@@ -9,13 +9,15 @@ function game404Plugin(): Plugin {
     name: 'game-404-plugin',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        if (req.url && req.url.startsWith('/game/')) {
-          const cleanUrl = req.url.split('?')[0]
-          const filePath = path.join(process.cwd(), 'public', cleanUrl)
-          if (!fs.existsSync(filePath)) {
-            res.statusCode = 404
-            res.end('Not Found')
-            return
+        if (req.url) {
+          const cleanUrl = req.url.split('?')[0].replace(/^\/cms-unblcked\.github\.io/, '')
+          if (cleanUrl.startsWith('/game/')) {
+            const filePath = path.join(process.cwd(), 'public', cleanUrl)
+            if (!fs.existsSync(filePath)) {
+              res.statusCode = 404
+              res.end('Not Found')
+              return
+            }
           }
         }
         next()
@@ -27,5 +29,5 @@ function game404Plugin(): Plugin {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [game404Plugin(), react(), tailwindcss()],
-  base: './',
+  base: '/cms-unblcked.github.io/',
 })
