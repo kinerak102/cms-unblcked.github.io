@@ -1,9 +1,31 @@
-import { defineConfig } from 'vite'
+import { defineConfig, Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import fs from 'fs'
+import path from 'path'
+
+function game404Plugin(): Plugin {
+  return {
+    name: 'game-404-plugin',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url && req.url.startsWith('/game/')) {
+          const cleanUrl = req.url.split('?')[0]
+          const filePath = path.join(process.cwd(), 'public', cleanUrl)
+          if (!fs.existsSync(filePath)) {
+            res.statusCode = 404
+            res.end('Not Found')
+            return
+          }
+        }
+        next()
+      })
+    }
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [game404Plugin(), react(), tailwindcss()],
   base: './',
 })
