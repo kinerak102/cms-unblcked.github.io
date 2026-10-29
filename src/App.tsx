@@ -15,7 +15,8 @@ export function App() {
   const [recentlyPlayedIds, setRecentlyPlayedIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('cms_recently_played');
-      return saved ? JSON.parse(saved) : ['retro-bowl'];
+      const parsed = saved ? JSON.parse(saved) : null;
+      return Array.isArray(parsed) ? parsed : ['retro-bowl'];
     } catch {
       return ['retro-bowl'];
     }

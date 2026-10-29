@@ -30,5 +30,5 @@ function game404Plugin(): Plugin {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [game404Plugin(), react(), tailwindcss()],
-  base: '/cms-unblcked.github.io/',
+  base: './',
 })
