@@ -4,12 +4,14 @@ import { Home, Gamepad2, GraduationCap, ShieldCheck, Laptop } from 'lucide-react
 interface SidebarProps {
   activeTab: 'home' | 'games';
   setActiveTab: (tab: 'home' | 'games') => void;
+  totalGamesCount?: number;
   onSelectGame?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   setActiveTab,
+  totalGamesCount = 3,
   onSelectGame,
 }) => {
   return (
@@ -44,8 +46,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Gamepad2 className="h-4 w-4" />
           <span>All Games</span>
-          <span className="ml-auto rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
-            1
+          <span className="ml-auto rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-300 font-bold">
+            {totalGamesCount}
           </span>
         </button>
       </nav>

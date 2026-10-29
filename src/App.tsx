@@ -3,22 +3,29 @@ import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { GameCard } from './components/GameCard';
 import { GamePlayer } from './components/GamePlayer';
+import { GAMES, type Game } from './data/games';
 import { Gamepad2, SearchX, Sparkles, Trophy, ShieldCheck, Cpu } from 'lucide-react';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'games'>('home');
   const [currentView, setCurrentView] = useState<'library' | 'player'>('library');
+  const [selectedGame, setSelectedGame] = useState<Game>(GAMES[0]);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Handle URL hash routing and browser back button state
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash === '#/games/retro-bowl') {
-        setCurrentView('player');
-      } else {
-        setCurrentView('library');
+      const match = hash.match(/^#\/games\/([a-z0-9-]+)$/);
+      if (match) {
+        const found = GAMES.find((g) => g.id === match[1]);
+        if (found) {
+          setSelectedGame(found);
+          setCurrentView('player');
+          return;
+        }
       }
+      setCurrentView('library');
     };
 
     handleHashChange();
@@ -26,8 +33,9 @@ export function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const handlePlayRetroBowl = () => {
-    window.location.hash = '/games/retro-bowl';
+  const handlePlayGame = (game: Game) => {
+    setSelectedGame(game);
+    window.location.hash = `/games/${game.id}`;
     setCurrentView('player');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -37,8 +45,16 @@ export function App() {
     setCurrentView('library');
   };
 
-  // Filter game matching search query
-  const matchesSearch = 'retro bowl american football nfl sports 3kh0'.toLowerCase().includes(searchQuery.toLowerCase().trim());
+  // Filter games matching search query
+  const filteredGames = GAMES.filter((game) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    return (
+      game.title.toLowerCase().includes(query) ||
+      game.description.toLowerCase().includes(query) ||
+      game.category.toLowerCase().includes(query)
+    );
+  });
 
   return (
     <div className="min-h-screen bg-[#0b1120] text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
@@ -62,6 +78,7 @@ export function App() {
               handleBackToLibrary();
             }
           }}
+          totalGamesCount={GAMES.length}
           onSelectGame={handleBackToLibrary}
         />
 
@@ -69,7 +86,7 @@ export function App() {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col gap-8">
           {currentView === 'player' ? (
             /* Embedded Gameplay View */
-            <GamePlayer onBack={handleBackToLibrary} />
+            <GamePlayer game={selectedGame} onBack={handleBackToLibrary} />
           ) : (
             /* Game Library / Homepage View */
             <>
@@ -116,23 +133,30 @@ export function App() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-white">
-                      {searchQuery ? `Search Results for "${searchQuery}"` : activeTab === 'home' ? 'Featured Game' : 'Game Library'}
+                      {searchQuery ? `Search Results for "${searchQuery}"` : activeTab === 'home' ? 'Featured Collection' : 'Game Library'}
                     </h2>
                     <p className="text-xs text-slate-400">
-                      Select a game to start playing directly in your browser.
+                      Select a game to play inside the portal or open its official page.
                     </p>
                   </div>
                 </div>
 
                 <div className="text-xs font-semibold text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
-                  Showing 1 Game
+                  Showing {filteredGames.length} {filteredGames.length === 1 ? 'Game' : 'Games'}
                 </div>
               </div>
 
               {/* Game Cards Grid */}
-              {matchesSearch ? (
-                <div className="flex flex-col gap-6">
-                  <GameCard onPlay={handlePlayRetroBowl} featured={true} />
+              {filteredGames.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6">
+                  {filteredGames.map((game) => (
+                    <GameCard
+                      key={game.id}
+                      game={game}
+                      onPlay={handlePlayGame}
+                      featured={game.featured}
+                    />
+                  ))}
                 </div>
               ) : (
                 /* No Results Found View */
@@ -142,7 +166,7 @@ export function App() {
                   </div>
                   <h3 className="text-lg font-bold text-white mb-1">No Games Found</h3>
                   <p className="text-xs text-slate-400 max-w-sm mb-4">
-                    We couldn't find any games matching "{searchQuery}". Retro Bowl is currently the primary featured game in this library.
+                    We couldn't find any games matching "{searchQuery}". Try adjusting your search query.
                   </p>
                   <button
                     onClick={() => setSearchQuery('')}
@@ -160,9 +184,9 @@ export function App() {
                   <span>— Educational Learning Portal</span>
                 </div>
                 <div className="flex items-center gap-4 text-slate-400">
-                  <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5 text-amber-400" /> Retro Bowl Edition</span>
+                  <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5 text-amber-400" /> Multi-Game Collection</span>
                   <span>•</span>
-                  <span>CMS Portal v1.0</span>
+                  <span>CMS Portal v2.0</span>
                 </div>
               </footer>
             </>
