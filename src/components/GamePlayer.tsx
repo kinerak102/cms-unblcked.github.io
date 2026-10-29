@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Maximize2, Minimize2, RotateCcw, AlertTriangle, ShieldCheck, Keyboard, MousePointer, ExternalLink, ShieldAlert } from 'lucide-react';
 import type { Game } from '../data/games';
 
@@ -15,6 +15,12 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({ game, onBack }) => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setHasError(false);
+    setUseMirrorSource(false);
+  }, [game.id]);
 
   const activeUrl = useMirrorSource && game.id === 'retro-bowl'
     ? 'https://raw.githack.com/3kho/retro-bowl/main/production.html'
